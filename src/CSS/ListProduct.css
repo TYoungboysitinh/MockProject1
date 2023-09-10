@@ -1,0 +1,48 @@
+.view{
+    background-color: aqua;
+    border-radius: 0;
+    margin: 4px;
+}
+.edit{
+    background-color: blue;
+    color: white;
+    border-radius: 0;
+    margin: 4px;
+}
+.card-title{
+    margin-bottom: 0;
+    background-color: gainsboro;
+    padding: 1%;
+}
+.delete{
+    background-color: red;
+    color: white;
+    border-radius: 0;
+    margin: 4px;
+}
+.product-table td{
+    vertical-align: middle;
+    text-align: center;
+}
+.table{
+    border-radius: 10px;
+}
+.btn-primary{
+    margin-left: 1%;
+    width: 20%;
+    border-radius: 0;
+}
+.ht{
+    display: flex;
+    align-items: center;
+    height: 50px ;
+    width: 98%;
+    margin-left: 1%;
+    margin-top: 3%;
+    background-color: gainsboro;
+    margin-bottom: 3%;
+}
+.ht p{
+    margin-bottom: 0;
+    margin-left: 5%;
+}
