@@ -5,7 +5,8 @@ export default class ListProducts extends Component {
     constructor(props){
         super(props);
         this.state={
-            totalQuantity:this.calculateTotalQuantity(this.props.ListProducts),
+            totalQuantity:this.calculateTotal(this.props.ListProducts),
+            totalPrice:this.calculateTotalPrice(this.props.ListProducts),
         }
     }
     handleEditClick = (product) => {
@@ -13,6 +14,9 @@ export default class ListProducts extends Component {
       };      
     handleEditOrView = (product,actionName) =>{
         this.props.onHandleEditOrView(true, product, actionName);
+        const subtotal = product.price * product.quantity;
+        const productWithSubtotal = { ...product, subtotal: subtotal };
+        this.props.onHandleEditOrView(true, productWithSubtotal, actionName);
     }
     onHandleEditOrView = (toggle, actionName, product) => {
         this.props.onHandleEditOrView(toggle, actionName, product);
@@ -22,34 +26,59 @@ export default class ListProducts extends Component {
             this.props.onDeleteProduct(productID);
         }
     }
-    updateTotalQuantity = (totalQuantity) => {
+    updateTotal = (totalQuantity, totalPrice) => {
         this.setState({
           totalQuantity: totalQuantity,
         });
+        this.setState({
+          totalPrice: totalPrice,  
+        })
       };
       
-    calculateTotalQuantity = () => {
+    calculateTotal = () => {
         if (this.props.ListProducts && this.props.ListProducts.length > 0) {
           let totalQuantity = 0;
           this.props.ListProducts.forEach((product) => {
-            totalQuantity += product.quantity;
+            totalQuantity += parseInt(product.quantity, 10) ;
           });
           return totalQuantity;
         } else {
           return 0;
         }
     };
-    componentDidUpdate(prevProps){
-        if(prevProps.ListProducts !== this.props.ListProducts){
-            const totalQuantity = this.calculateTotalQuantity();
-            this.updateTotalQuantity(totalQuantity);
+    calculateTotalPrice = () => {
+        if (this.props.ListProducts && this.props.ListProducts.length > 0) {
+          let totalPrice = 0;
+          this.props.ListProducts.forEach((product) => {
+            totalPrice += parseInt(product.price, 10) ;
+          });
+          return totalPrice;
+        } else {
+          return 0;
         }
-    }
+    };
+    calculateTotalSubtotal = () => {
+        if (this.props.ListProducts && this.props.ListProducts.length > 0) {
+          let totalSubtotal = 0;
+          this.props.ListProducts.forEach((product) => {
+            totalSubtotal += parseInt(product.subtotal, 10) ;
+          });
+          return totalSubtotal;
+        } else {
+          return 0;
+        }
+    };
+    componentDidUpdate(prevProps) {
+        if (prevProps.ListProducts !== this.props.ListProducts) {
+          const totalQuantity = this.calculateTotal(this.props.ListProducts);
+          const totalPrice = this.calculateTotalPrice(this.props.ListProducts);
+          const totalSubtotal = this.calculateTotalSubtotal(this.props.ListProducts);
+          this.updateTotal(totalQuantity, totalPrice, totalSubtotal);
+        }
+      }
   render() {     
     let renderProducts = this.props.ListProducts;
     let elementProduct = renderProducts.map((renderProducts,index)=>{
-        const subtotal = renderProducts.price * renderProducts.quantity;
-        console.log(subtotal);
         return(
             <>
             <tr key={index} className='product-table'>
@@ -58,7 +87,7 @@ export default class ListProducts extends Component {
                 <td>{renderProducts.productName}</td>
                 <td>{renderProducts.quantity}</td>
                 <td><span style={{ color: 'red', display: 'inline-block', marginRight: '4px' }}>$</span>{renderProducts.price}</td>
-                <td><span style={{ color: 'red', display: 'inline-block', marginRight: '4px' }}>$</span>{subtotal}</td>
+                <td><span style={{ color: 'red', display: 'inline-block', marginRight: '4px' }}>$</span>{renderProducts.subtotal}</td>
                 <td>
                     <div>
                         <button className='btn view'
@@ -104,9 +133,9 @@ export default class ListProducts extends Component {
                             <td></td>
                             <td></td>
                             <td style={{ verticalAlign: 'middle', textAlign: 'center' }}><b>Total</b></td>
-                            <td style={{ verticalAlign: 'middle', textAlign: 'center' }}><b>{this.calculateTotalQuantity()}</b></td>
-                            <td style={{ verticalAlign: 'middle', textAlign: 'center' }}><span style={{ color: 'black', display: 'inline-block', marginRight: '4px' }}>$</span><b>Price</b></td>
-                            <td style={{ verticalAlign: 'middle', textAlign: 'center' }}><span style={{ color: 'black', display: 'inline-block', marginRight: '4px' }}>$</span><b>Subtotal</b></td>
+                            <td style={{ verticalAlign: 'middle', textAlign: 'center' }}><b>{this.calculateTotal()}</b></td>
+                            <td style={{ verticalAlign: 'middle', textAlign: 'center' }}><span style={{ color: 'black', display: 'inline-block', marginRight: '4px' }}>$</span><b>{this.calculateTotalPrice()}</b></td>
+                            <td style={{ verticalAlign: 'middle', textAlign: 'center' }}><span style={{ color: 'black', display: 'inline-block', marginRight: '4px' }}>$</span><b>{this.props.totalSubtotal}</b></td>
                             <td></td>
                         </tr>
                     </tbody>
