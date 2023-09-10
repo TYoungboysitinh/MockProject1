@@ -20,35 +20,55 @@ export default class Form extends Component {
     });
   }
 
-  calculateNewTotalQuantity = (updatedProduct, productList) => {
+  calculateNewTotal = (updatedProduct, productList) => {
     if (productList && productList.length > 0) {
       let newTotalQuantity = 0;
+      let newTotalPrice = 0;
+      let newTotalSubtotal = 0;
       productList.forEach((product) => {
         if (product.productID === updatedProduct.productID) {
           newTotalQuantity += updatedProduct.quantity;
+          newTotalPrice += updatedProduct.price;
+          newTotalSubtotal += updatedProduct.subtotal;
         } else {
           newTotalQuantity += product.quantity;
+          newTotalPrice += product.price;
+          newTotalSubtotal += product.subtotal;
         }
       });
-      return newTotalQuantity;
+      return {
+        newTotalQuantity,
+        newTotalPrice,
+        newTotalSubtotal,
+      };
     } else {
-      return 0;
+      return {
+        newTotalQuantity: 0,
+        newTotalPrice: 0,
+        newTotalSubtotal: 0,
+      };
     }
   };
-
-  handleSubmit = (event) => {
-    event.preventDefault();
-    this.props.onSubmit(false, this.state);
-    if (typeof this.props.updateTotalQuantity === 'function') {
-      const newTotalQuantity = this.calculateNewTotalQuantity(
-        this.state,
-        this.props.ListProducts
-      );
-      this.props.updateTotalQuantity(newTotalQuantity);
-    } else {
-      console.error("updateTotalQuantity is not a function");
-    }
-  }
+    handleSubmit = (event) => {
+        event.preventDefault();
+        this.props.onSubmit(false, this.state);
+        const subtotal = this.state.price * this.state.quantity;
+        const productWithSubtotal = {
+            ...this.state,
+            subtotal: subtotal
+        };
+        this.props.onSubmit(false, productWithSubtotal);
+    
+        if (typeof this.props.updateTotal === 'function') {
+        const newTotals = this.calculateNewTotal(
+            this.state,
+            this.props.ListProducts
+        );
+        this.props.updateTotal(newTotals.newTotalQuantity, newTotals.newTotalPrice, newTotals.newTotalSubtotal);
+        } else {
+        console.error("updateTotal is not a function");
+        }
+    };
   componentWillMount = () => {
     let { renderActionName, renderProducts } = this.props;
     if (renderActionName === "Close" || renderActionName === "Update") {
